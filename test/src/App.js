@@ -1,16 +1,32 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import axios from 'axios';
 
-function App(){
-  const [count, setCount] = useState(0)
+const App = () => {
+    const [jokes, setJokes] = useState([]);
+    const [load, setLoad] = useState(false);
+    const [error, setError] = useState('');
 
-  return(
-    <div>
-      <p>You clicked { count } times</p>
-      <button onClick={() => setCount(count + 1)}>
-        Click Me
-      </button>
-    </div>
-  )
-}
+    useEffect(() => {
+        axios.get('http://api.icndb.com/jokes/')
+            .then(res => {
+                setJokes(res.data);
+                setLoad(true);
+            })
+            .catch(err => {
+                setError(err.message);
+                setLoad(true)
+            })
+    }, []);
 
-export default App
+    if (load) {
+        return (
+            <ul>{error ? <li>{error.message}</li> : jokes.value.map((fact) => <li class="joke" id={fact.id}>{fact.joke}</li>)}</ul>
+        );
+    }
+    else {
+        return (
+              <div>Loading...</div>
+        );
+    }
+};
+export default App;
